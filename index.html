@@ -1,16 +1,2162 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Page</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="icon.jpg"/>
+<title>都市异闻录：鬼契约底座</title>
+<style>
+:root{
+  --bg:#050505;
+  --panel:#0d0d0d;
+  --panel-2:#111;
+  --line:#252525;
+  --line-strong:#3a3a3a;
+  --text:#d0d0d0;
+  --muted:#999;
+  --green:#90ff90;
+  --red:#ff6b6b;
+  --purple:#c77dff;
+  --yellow:#ffd166;
+}
+
+*{box-sizing:border-box;}
+
+body{
+  margin:0;
+  background:radial-gradient(circle at top,#111 0,#050505 42%,#020202 100%);
+  color:var(--text);
+  font-family:Consolas,"Microsoft YaHei",monospace;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+}
+
+body.pollution-critical{
+  color:#ffb3b3;
+}
+
+body.pollution-critical #game{
+  border-color:#6b1d1d;
+  box-shadow:0 24px 80px rgba(120,0,0,.35);
+}
+
+body.pollution-critical #title,
+body.pollution-critical .green,
+body.pollution-critical #status,
+body.pollution-critical .modalHeader{
+  color:#ff4d4d;
+}
+
+body.pollution-critical button:hover:not(:disabled),
+body.pollution-critical .inputLine:focus{
+  border-color:#ff4d4d;
+}
+
+#game{
+  width:min(94%,960px);
+  height:92vh;
+  background:rgba(13,13,13,.96);
+  border:1px solid var(--line);
+  display:flex;
+  flex-direction:column;
+  position:relative;
+  box-shadow:0 24px 70px rgba(0,0,0,.45);
+}
+
+#title{
+  padding:14px 16px;
+  border-bottom:1px solid var(--line);
+  color:var(--green);
+  font-size:22px;
+  letter-spacing:0;
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+}
+
+#quickActions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+
+#status{
+  padding:10px 16px;
+  border-bottom:1px solid var(--line);
+  font-size:13px;
+  color:var(--muted);
+  white-space:pre-line;
+  line-height:1.55;
+}
+
+#output{
+  flex:1;
+  padding:18px;
+  overflow-y:auto;
+  line-height:1.72;
+  white-space:pre-wrap;
+}
+
+#choices{
+  padding:14px;
+  border-top:1px solid var(--line);
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  min-height:68px;
+  align-items:center;
+}
+
+button,input{
+  font:inherit;
+}
+
+button{
+  background:var(--panel-2);
+  border:1px solid var(--line-strong);
+  color:var(--text);
+  padding:10px 14px;
+  cursor:pointer;
+  transition:background .18s,border-color .18s,color .18s,transform .18s;
+}
+
+button:hover:not(:disabled){
+  background:#171717;
+  border-color:var(--green);
+  color:#f0fff0;
+}
+
+button:active:not(:disabled){
+  transform:translateY(1px);
+}
+
+button:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+
+.miniBtn{
+  padding:7px 10px;
+  font-size:12px;
+}
+
+.green{color:var(--green);}
+.red{color:var(--red);}
+.purple{color:var(--purple);}
+.yellow{color:var(--yellow);}
+.muted{color:var(--muted);}
+
+.inputLine{
+  width:min(420px,100%);
+  padding:11px 12px;
+  background:#050505;
+  color:#fff;
+  border:1px solid var(--line-strong);
+  outline:none;
+}
+
+.inputLine:focus{
+  border-color:var(--green);
+}
+
+.modal{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  width:min(86%,720px);
+  background:#101010;
+  border:1px solid var(--line-strong);
+  display:none;
+  flex-direction:column;
+  z-index:10;
+  box-shadow:0 18px 60px rgba(0,0,0,.65);
+}
+
+#phone{top:10%;height:74%;}
+#bag{top:16%;height:62%;}
+
+.modalHeader{
+  padding:10px 12px;
+  border-bottom:1px solid var(--line);
+  color:var(--green);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+
+.modalBody{
+  padding:12px;
+  overflow-y:auto;
+  flex:1;
+}
+
+.phoneGrid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+  gap:10px;
+}
+
+.phoneBtn{
+  width:100%;
+  min-height:52px;
+}
+
+.section{
+  border-top:1px solid var(--line);
+  padding-top:12px;
+  margin-top:12px;
+}
+
+.row{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  border-bottom:1px solid #1d1d1d;
+  padding:9px 0;
+}
+
+.row:last-child{border-bottom:0;}
+
+.danger{
+  border-color:#5b2a2a;
+  color:#ffd3d3;
+}
+
+@media (max-width:640px){
+  body{align-items:stretch;}
+  #game{
+    width:100%;
+    height:100vh;
+    border-left:0;
+    border-right:0;
+  }
+  #title{
+    align-items:flex-start;
+    flex-direction:column;
+    font-size:19px;
+  }
+  #quickActions{
+    justify-content:flex-start;
+  }
+  #output{
+    padding:14px;
+  }
+  .modal{
+    width:94%;
+  }
+}
+</style>
 </head>
 <body>
-    <h1>nibabajiushiwo</h1>
-    <img src="1234567.png" alt="123" style="width: 123px; height: auto">
-    <p style="text-align: center; font-size: 30px;">qwertyui</p>
-    <script>
-        console.log("AAA")
-    </script>
+
+<div id="game">
+  <div id="title">
+    <span>《都市异闻录：鬼契约》</span>
+    <div id="quickActions">
+      <button id="phoneQuickBtn" class="miniBtn" onclick="openPhone()">旧手机</button>
+      <button id="bagQuickBtn" class="miniBtn" onclick="openBag()">背包</button>
+      <button class="miniBtn" onclick="saveGame()">保存</button>
+    </div>
+  </div>
+
+  <div id="status"></div>
+  <div id="output"></div>
+  <div id="choices"></div>
+
+  <div id="phone" class="modal">
+    <div class="modalHeader">
+      <span id="phoneTitle">旧手机</span>
+      <button class="miniBtn" onclick="closePhone()">关闭</button>
+    </div>
+    <div id="phoneBody" class="modalBody">
+      <div class="phoneGrid">
+        <button class="phoneBtn" onclick="tasks()">任务</button>
+        <button class="phoneBtn" onclick="teleportUI()">传送</button>
+        <button class="phoneBtn" onclick="shop()">黑市商店</button>
+        <button class="phoneBtn" onclick="codex()">异常图鉴</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="bag" class="modal">
+    <div class="modalHeader">
+      <span>背包</span>
+      <button class="miniBtn" onclick="closeBag()">关闭</button>
+    </div>
+    <div id="bagBody" class="modalBody"></div>
+  </div>
+</div>
+
+<script>
+const output = document.getElementById("output");
+const choices = document.getElementById("choices");
+const statusBar = document.getElementById("status");
+const phone = document.getElementById("phone");
+const phoneBody = document.getElementById("phoneBody");
+const phoneTitle = document.getElementById("phoneTitle");
+const phoneQuickBtn = document.getElementById("phoneQuickBtn");
+const bag = document.getElementById("bag");
+const bagBody = document.getElementById("bagBody");
+
+const SAVE_KEY = "urban_contract_save_v1";
+
+const ghostBook = {
+  ghostEye:{
+    id:"ghostEye",
+    name:"鬼眼",
+    power:22,
+    instability:22,
+    passive:"洞察恐惧：受到的理智降低减少 50%。",
+    desc:"一颗藏在掌心纹路里的眼，能看见鬼物行动前的恶意。",
+    skills:[
+      {id:"mindShock",name:"精神震荡",cost:18,desc:"造成精神震荡伤害，眩晕 1 回合，并追加敌人精神 10% + 20 的伤害。"},
+      {id:"weakPoint",name:"窥破弱点",cost:14,desc:"造成中等伤害，并使敌人下一次造成的理智伤害降低 20%。"},
+      {id:"terrorGaze",name:"恐惧凝视",cost:20,desc:"造成伤害，使敌人脆弱 2 回合，受到伤害提高 15%。"}
+    ]
+  },
+  seamWraith:{
+    id:"seamWraith",
+    name:"缝尸线",
+    power:20,
+    instability:28,
+    passive:"省力牵引：技能鬼气消耗减少 15%。",
+    desc:"像黑色头发一样细的线，另一端连着看不见的尸体。",
+    skills:[
+      {id:"blackSuture",name:"黑线缝合",cost:16,desc:"造成伤害，并让敌人流血 2 回合。"},
+      {id:"limbBind",name:"肢体牵引",cost:18,desc:"造成少量伤害，并有 70% 概率眩晕敌人 1 回合。"},
+      {id:"borrowedPulse",name:"借尸还息",cost:22,desc:"造成伤害，并恢复少量理智。"}
+    ]
+  },
+  ashUmbrella:{
+    id:"ashUmbrella",
+    name:"灰烬伞",
+    power:18,
+    instability:18,
+    passive:"遮阴：污染增长减少 20%，危险时间理智损失额外减少 15%。",
+    desc:"一把落满灰的旧伞，撑开时能听见雨落在坟土上的声音。",
+    skills:[
+      {id:"ashWard",name:"灰幕护身",cost:15,desc:"获得护盾，抵挡下一次部分伤害。"},
+      {id:"rainNeedles",name:"阴雨针",cost:17,desc:"造成稳定伤害，并降低敌人攻击 2 回合。"},
+      {id:"burialWind",name:"送葬风",cost:24,desc:"造成较高伤害，若敌人生命低于 35% 则额外伤害。"}
+    ]
+  }
+};
+
+const scenes = {};
+const rookieGhostIds = ["ghostEye","seamWraith","ashUmbrella"];
+
+const hospitalEnemies = [
+  {id:"facelessPatient",name:"无面病患",maxHp:90,spirit:80,attack:13,coins:[4,8],qiGain:5,skill:"抓挠病历"},
+  {id:"stitchedNurse",name:"缝口护士",maxHp:105,spirit:90,attack:15,coins:[5,10],qiGain:6,skill:"消毒针雨"},
+  {id:"backwardDoctor",name:"倒行医生",maxHp:125,spirit:110,attack:17,coins:[7,12],qiGain:7,skill:"逆行手术"}
+];
+
+let combat = null;
+
+let player = freshPlayer();
+
+function freshPlayer(){
+  return {
+    name:"",
+    sanity:100,
+    pollution:0,
+    spirit:0,
+    ghostQi:0,
+    maxGhostQi:0,
+    ghostCoins:0,
+    exorcistLevel:1,
+    qiAbsorbed:0,
+    hospitalKills:0,
+    location:"出租屋",
+    chapter:1,
+    time:164,
+    inventory:["旧手机"],
+    ghosts:[],
+    flags:{
+      introSeen:false,
+      escapedApartment:false,
+      systemsUnlocked:false,
+      foundRules:false,
+      checkedPeephole:false,
+      ignoredKnock:false,
+      mirrorSeen:false,
+      hasKey:false,
+      hallwayWaited:false,
+      metNpc:false,
+      hospitalRelicDropped:false,
+      hospitalTrialCleared:false
+    },
+    tasks:[
+      {id:"leave_room",title:"逃离公寓",done:false,reward:{item:"契约卷轴"}},
+      {id:"meet_npc",title:"在便利店与“御神”接应者会合",done:false,reward:{coins:30}},
+      {id:"first_contract",title:"在 03:00-07:00 使用契约卷轴，契约第一只鬼",done:false,reward:{coins:50}},
+      {id:"hospital_hunt",title:"前往闹鬼医院击杀 10 个鬼物",done:false,reward:{coins:120}},
+      {id:"breakthrough_2",title:"经验值满后，通过诡秘医院试炼突破二阶",done:false,reward:{coins:80}}
+    ],
+    relics:[],
+    rulesKnown:[],
+    violations:0,
+    codex:["ghostEye","seamWraith","ashUmbrella"],
+    gameOver:false
+  };
+}
+
+function normalizePlayer(data){
+  const defaults = freshPlayer();
+  player = Object.assign(freshPlayer(), data || {});
+  player.inventory = Array.isArray(player.inventory) ? player.inventory : ["旧手机"];
+  player.ghosts = Array.isArray(player.ghosts) ? player.ghosts : [];
+  player.ghosts = player.ghosts.map(ghost => {
+    const id = ghost.id === "redShadow" ? "ghostEye" : ghost.id;
+    const base = ghostBook[id];
+    return base ? Object.assign({},ghost,base,{id:base.id}) : ghost;
+  });
+  player.relics = Array.isArray(player.relics) ? player.relics : [];
+  player.flags = Object.assign(freshPlayer().flags, player.flags || {});
+  player.tasks = Array.isArray(player.tasks) ? player.tasks : defaults.tasks;
+  player.tasks = defaults.tasks.map(defaultTask => {
+    const savedTask = player.tasks.find(task => task.id === defaultTask.id);
+    return Object.assign({}, defaultTask, savedTask || {}, {
+      reward: defaultTask.reward
+    });
+  });
+  player.rulesKnown = Array.isArray(player.rulesKnown) ? player.rulesKnown : [];
+  player.codex = Array.isArray(player.codex) ? player.codex : ["redShadow"];
+  if(player.codex.includes("redShadow")){
+    player.codex = ["ghostEye","seamWraith","ashUmbrella"];
+  }
+  if(typeof player.time !== "number") player.time = 164;
+  if(typeof player.chapter !== "number") player.chapter = 1;
+  if(typeof player.violations !== "number") player.violations = 0;
+  if(typeof player.ghostCoins !== "number") player.ghostCoins = 0;
+  if(typeof player.exorcistLevel !== "number") player.exorcistLevel = 1;
+  if(typeof player.qiAbsorbed !== "number") player.qiAbsorbed = 0;
+  if(typeof player.hospitalKills !== "number") player.hospitalKills = 0;
+  if(typeof player.spirit !== "number") player.spirit = 0;
+  if(typeof player.ghostQi !== "number") player.ghostQi = 0;
+  if(typeof player.maxGhostQi !== "number") player.maxGhostQi = player.spirit;
+  player.sanity = Math.min(player.sanity, maxSanity());
+  player.ghostQi = Math.min(player.ghostQi, player.maxGhostQi);
+}
+
+function print(text,className=""){
+  const line = document.createElement("div");
+  if(className) line.classList.add(className);
+  line.innerText = text;
+  output.appendChild(line);
+  output.scrollTop = output.scrollHeight;
+}
+
+function clearChoices(){
+  choices.innerHTML = "";
+}
+
+function addChoice(text,callback,options={}){
+  const btn = document.createElement("button");
+  btn.innerText = text;
+  btn.disabled = Boolean(options.disabled);
+  btn.onclick = () => {
+    if(player.gameOver) return;
+    callback();
+  };
+  choices.appendChild(btn);
+  return btn;
+}
+
+function dayMinute(minutes=player.time){
+  return ((minutes % 1440) + 1440) % 1440;
+}
+
+function formatTime(minutes=player.time){
+  const day = Math.floor(minutes / 1440) + 1;
+  const current = dayMinute(minutes);
+  const h = Math.floor(current / 60);
+  const displayMinute = current % 60;
+  const dayText = day > 1 ? `D${day} ` : "";
+  return `${dayText}${String(h).padStart(2,"0")}:${String(displayMinute).padStart(2,"0")}`;
+}
+
+function isAfterThree(){
+  return isDangerTime();
+}
+
+function isDangerTime(minutes=player.time){
+  const current = dayMinute(minutes);
+  return current >= 180 && current < 420;
+}
+
+function isSleepTime(minutes=player.time){
+  const current = dayMinute(minutes);
+  return current >= 1320 || current < 420 || (current >= 720 && current < 840);
+}
+
+function dangerMultiplier(){
+  return isDangerTime() ? 3 : 1;
+}
+
+function advanceTime(minutes=1,reason=""){
+  const wasDanger = isDangerTime();
+  player.time += minutes;
+  if(reason) print(`[ TIME ] ${reason}，现在是 ${formatTime()}。`,"muted");
+  const nowDanger = isDangerTime();
+  if(!wasDanger && nowDanger){
+    print("凌晨 3:00 到了。世界背面的东西开始靠近。","red");
+    print("03:00-07:00 是最危险的时间，任何理智损失都会被放大。","red");
+  }else if(wasDanger && !nowDanger){
+    print("早晨 7:00 已过。危险窗口暂时关闭。","green");
+  }
+  passivePollution(minutes);
+  updateStatus();
+}
+
+function learnRule(id,text){
+  if(player.rulesKnown.includes(id)) return;
+  player.rulesKnown.push(id);
+  print(`[ RULE ] ${text}`,"yellow");
+}
+
+function ruleViolation(text,{sanity=10,pollution=5,lethal=false}={}){
+  player.violations += 1;
+  print(`[ 违规 ] ${text}`,"red");
+  if(lethal){
+    death("这是一条死亡规则。你听见身后有东西笑了一声，随后一切归于黑暗。");
+    return;
+  }
+  changeStats({sanity:-sanity,pollution});
+}
+
+function maxSanity(){
+  const base = 100 + player.spirit * 2;
+  return player.pollution >= 100 ? Math.floor(base * 0.5) : base;
+}
+
+function isPollutionCritical(){
+  return player.pollution >= 100;
+}
+
+function passivePollution(minutes){
+  if(player.ghosts.length === 0) return;
+  const pressure = player.ghostQi <= 0 ? 1 : 0.2;
+  player.pollution = Math.min(150, player.pollution + minutes * pressure);
+  if(player.ghostQi <= 0 && minutes > 0){
+    print("鬼气枯竭，契约鬼的阴影开始反噬你的身体。污染正在上升。","red");
+  }
+}
+
+function maybeGlitch(){
+  if(!isPollutionCritical() || Math.random() > 0.18) return;
+  const glitches = ["■■■■听见了吗■■", "不要相信状态栏", "红色是正常的", "祂在读你的存档", "0xGHOST_ERR_144"];
+  print(glitches[Math.floor(Math.random() * glitches.length)],"red");
+}
+
+function updateStatus(){
+  updateSystemAccess();
+  document.body.classList.toggle("pollution-critical",isPollutionCritical());
+  player.sanity = Math.min(player.sanity, maxSanity());
+  statusBar.innerText =
+    `玩家:${player.name || "未登录"}\n` +
+    `时间:${formatTime()} ｜ 理智:${Math.floor(player.sanity)}/${maxSanity()} ｜ 精神:${player.spirit} ｜ 鬼气:${Math.floor(player.ghostQi)}/${player.maxGhostQi}\n` +
+    `污染:${Math.floor(player.pollution)} ｜ 位置:${player.location} ｜ 经验值:${player.qiAbsorbed}/${realmQiCap()}\n` +
+    `御鬼师:${player.exorcistLevel}级 ｜ 鬼币:${player.ghostCoins} ｜ 危险倍率:x${dangerMultiplier()}`;
+
+  if(player.sanity <= 0 && !player.gameOver){
+    death("你的理智被最后一声低语压垮。");
+  }
+}
+
+function updateSystemAccess(){
+  phoneQuickBtn.innerText = player.flags.systemsUnlocked ? "终端" : "旧手机";
+  phoneTitle.innerText = player.flags.systemsUnlocked ? "神秘终端" : "旧手机";
+}
+
+function changeStats({sanity=0,pollution=0}){
+  if(sanity < 0 && player.ghosts.some(ghost => ghost.id === "ghostEye")){
+    sanity *= 0.5;
+  }
+  if(sanity < 0 && isDangerTime() && player.ghosts.some(ghost => ghost.id === "ashUmbrella")){
+    sanity *= 0.85;
+  }
+  if(pollution > 0 && player.ghosts.some(ghost => ghost.id === "ashUmbrella")){
+    pollution *= 0.8;
+  }
+  const sanityDelta = sanity < 0 ? sanity * dangerMultiplier() : sanity;
+  player.pollution = Math.max(0, Math.min(150, player.pollution + pollution));
+  player.sanity = Math.max(0, Math.min(maxSanity(), player.sanity + sanityDelta));
+  updateStatus();
+  maybeGlitch();
+}
+
+function setLocation(location){
+  player.location = location;
+  updateStatus();
+}
+
+function enterLocation(location){
+  setLocation(location);
+  if(location === "出租屋" && player.flags.escapedApartment){
+    apartmentHub();
+  }else if(location === "闹鬼医院"){
+    hospitalHub();
+  }
+}
+
+function completeTask(id){
+  const task = player.tasks.find(item => item.id === id);
+  if(task && !task.done){
+    task.done = true;
+    print(`[ TASK ] ${task.title} 已完成`,"green");
+    grantTaskReward(task);
+  }
+}
+
+function grantTaskReward(task){
+  if(!task.reward) return;
+  if(task.reward.item) addItem(task.reward.item);
+  if(task.reward.coins) addGhostCoins(task.reward.coins);
+}
+
+function addGhostCoins(amount){
+  player.ghostCoins += amount;
+  print(`[ REWARD ] 获得鬼币 x${amount}`,"green");
+  updateStatus();
+}
+
+function hasItem(name){
+  return player.inventory.includes(name);
+}
+
+function addItem(name){
+  if(!hasItem(name)){
+    player.inventory.push(name);
+    print(`[ ITEM ] 获得：${name}`,"green");
+  }
+}
+
+function describeReward(task){
+  if(!task.reward) return "奖励：无";
+  const parts = [];
+  if(task.reward.item) parts.push(task.reward.item);
+  if(task.reward.coins) parts.push(`鬼币 x${task.reward.coins}`);
+  return `奖励：${parts.join("，")}`;
+}
+
+function saveGame(){
+  localStorage.setItem(SAVE_KEY, JSON.stringify(player));
+  print("[ SYSTEM ] 游戏已保存","green");
+}
+
+function loadGame(){
+  const save = localStorage.getItem(SAVE_KEY);
+  if(!save){
+    print("没有找到存档。","red");
+    login();
+    return;
+  }
+
+  try{
+    normalizePlayer(JSON.parse(save));
+    updateStatus();
+    clearChoices();
+    print("[ SYSTEM ] 已读取存档","green");
+    print(`你回到了${player.location}。`);
+    addChoice("继续游戏",() => player.flags.escapedApartment ? afterApartmentStreet() : startIntro());
+    addChoice(player.flags.systemsUnlocked ? "打开终端" : "查看旧手机",openPhone);
+  }catch(error){
+    print("存档损坏，已为你开启新游戏。","red");
+    normalizePlayer();
+    login();
+  }
+}
+
+function newGame(){
+  normalizePlayer();
+  output.innerHTML = "";
+  login();
+}
+
+function death(reason){
+  if(player.flags.systemsUnlocked){
+    postChapterDeath(reason);
+    return;
+  }
+  player.gameOver = true;
+  clearChoices();
+  closePhone();
+  closeBag();
+  print("");
+  print(reason,"red");
+  print("你彻底崩溃了。","red");
+  print("但这座城市没有放过你。","purple");
+  addChoice("重启",() => location.reload());
+}
+
+function postChapterDeath(reason){
+  const coinLoss = Math.min(player.ghostCoins, randomInt(5,18));
+  const qiLoss = Math.min(player.qiAbsorbed, randomInt(3,10));
+  player.ghostCoins -= coinLoss;
+  player.qiAbsorbed -= qiLoss;
+  player.location = "出租屋";
+  player.sanity = Math.max(20, Math.floor(maxSanity() * 0.45));
+  player.ghostQi = Math.max(0, Math.floor(player.maxGhostQi * 0.35));
+  player.pollution = Math.min(150, player.pollution + 12);
+  combat = null;
+  clearChoices();
+  closePhone();
+  closeBag();
+  print("");
+  print(reason,"red");
+  print(`[ 死亡惩罚 ] 你在出租屋惊醒，损失鬼币 ${coinLoss}，损失经验值 ${qiLoss}。`,"red");
+  updateStatus();
+  addChoice("起身",apartmentHub);
+  addChoice("保存",saveGame);
+  saveGame();
+}
+
+function openPhone(){
+  phone.style.display = "flex";
+  if(player.flags.systemsUnlocked){
+    renderPhoneHome();
+  }else{
+    renderOldPhone();
+  }
+}
+
+function closePhone(){
+  phone.style.display = "none";
+}
+
+function openBag(){
+  bag.style.display = "flex";
+  renderBag();
+}
+
+function closeBag(){
+  bag.style.display = "none";
+}
+
+function renderPhoneHome(){
+  phoneBody.innerHTML = `
+    <div class="phoneGrid">
+      <button class="phoneBtn" onclick="tasks()">任务</button>
+      <button class="phoneBtn" onclick="teleportUI()">传送</button>
+      <button class="phoneBtn" onclick="shop()">黑市商店</button>
+      <button class="phoneBtn" onclick="codex()">异常图鉴</button>
+    </div>
+  `;
+}
+
+function renderOldPhone(){
+  phoneBody.innerHTML = "";
+  const info = document.createElement("div");
+  info.innerText =
+    "屏幕边缘裂开，电量显示为 44%。\n\n" +
+    "未读短信：\n" +
+    "02:44  不要看床底。\n" +
+    "02:47  如果门外有人敲门，先看猫眼。\n" +
+    "02:50  3:00 以后，不要相信镜子和电梯。";
+  phoneBody.appendChild(info);
+
+  const btn = document.createElement("button");
+  btn.className = "miniBtn";
+  btn.style.marginTop = "14px";
+  btn.innerText = "记下规则";
+  btn.onclick = () => {
+    learnRule("no_bed","规则一：不要看床底。尤其不要在 02:50 之后看。");
+    learnRule("check_peephole","规则二：门外有人敲门时，先看猫眼，不要立刻开门。");
+    learnRule("after_three","规则三：03:00 以后，不要相信镜子和电梯。");
+    player.flags.foundRules = true;
+    saveGame();
+  };
+  phoneBody.appendChild(btn);
+}
+
+function renderBag(){
+  bagBody.innerHTML = "";
+
+  const itemSection = document.createElement("div");
+  itemSection.innerHTML = `<b>物品</b><div class="muted" style="margin-top:6px">鬼币：${player.ghostCoins} ｜ 御鬼师等级：${player.exorcistLevel}级 ｜ 可驾驭鬼位：${ghostCapacity()}</div>`;
+  player.inventory.forEach(item => {
+    const row = document.createElement("div");
+    row.className = "row";
+    row.innerText = item;
+    itemSection.appendChild(row);
+  });
+
+  if(player.relics.length){
+    const relicTitle = document.createElement("div");
+    relicTitle.className = "section";
+    relicTitle.innerHTML = "<b>鬼器</b>";
+    player.relics.forEach(relic => {
+      const row = document.createElement("div");
+      row.className = "row";
+      row.innerText = `${relic.name} ｜ 耐久:${relic.durability}/${relic.maxDurability}`;
+      relicTitle.appendChild(row);
+    });
+    itemSection.appendChild(relicTitle);
+  }
+
+  const ghostSection = document.createElement("div");
+  ghostSection.className = "section";
+  ghostSection.innerHTML = "<b>契约鬼</b>";
+
+  if(!player.flags.systemsUnlocked){
+    const locked = document.createElement("div");
+    locked.className = "muted";
+    locked.style.marginTop = "10px";
+    locked.innerText = "你还不知道“契约”是什么。";
+    ghostSection.appendChild(locked);
+    bagBody.appendChild(itemSection);
+    bagBody.appendChild(ghostSection);
+    return;
+  }
+
+  if(player.ghosts.length === 0){
+    const empty = document.createElement("div");
+    empty.className = "muted";
+    empty.style.marginTop = "10px";
+    empty.innerText = "暂无契约鬼。";
+    ghostSection.appendChild(empty);
+  }
+
+  player.ghosts.forEach((ghost,index) => {
+    const row = document.createElement("div");
+    row.className = "row";
+    const text = document.createElement("span");
+    text.innerText = `${ghost.name} ｜ 力:${ghost.power} ｜ 失控:${ghost.instability}\n被动：${ghost.passive || "无"}`;
+    const btn = document.createElement("button");
+    btn.className = "miniBtn danger";
+    btn.innerText = "使用";
+    btn.onclick = () => useGhost(index);
+    row.appendChild(text);
+    row.appendChild(btn);
+    ghostSection.appendChild(row);
+  });
+
+  bagBody.appendChild(itemSection);
+  bagBody.appendChild(ghostSection);
+}
+
+function contractGhost(id){
+  if(!player.flags.systemsUnlocked){
+    print("你还没有获得契约系统。","red");
+    return;
+  }
+  if(!id){
+    attractContractGhost();
+    return;
+  }
+  const base = ghostBook[id];
+  if(!base) return;
+  if(player.ghosts.some(ghost => ghost.id === id)){
+    print(`${base.name} 已经与你签订契约。`,"yellow");
+    return;
+  }
+  if(player.ghosts.length >= ghostCapacity()){
+    print(`你的御鬼师等级不足。${player.exorcistLevel}级最多驾驭 ${ghostCapacity()} 只鬼。`,"red");
+    return;
+  }
+  if(!hasItem("契约卷轴")){
+    print("你需要契约卷轴来吸引并束缚鬼。","red");
+    return;
+  }
+
+  const ghost = {
+    id:base.id,
+    name:base.name,
+    power:base.power,
+    instability:base.instability,
+    passive:base.passive,
+    skills:base.skills
+  };
+  removeItem("契约卷轴");
+  player.ghosts.push(ghost);
+  if(player.spirit === 0 && player.maxGhostQi === 0){
+    player.spirit = 100;
+    player.maxGhostQi = 200;
+    player.ghostQi = 200;
+    player.sanity = Math.min(maxSanity(), player.sanity + 100);
+    print("契约回路被点燃。精神提升至一阶基准：100，鬼气上限提升至 200。","green");
+  }
+  completeTask("first_contract");
+  print(`你契约了：${ghost.name}`,"purple");
+  changeStats({pollution:8});
+  saveGame();
+  renderBag();
+  clearChoices();
+  addChoice("回到出租屋",apartmentHub);
+  addChoice("查看契约鬼",openBag);
+  addChoice("前往闹鬼医院",hospitalHub);
+}
+
+function attractContractGhost(){
+  if(!player.flags.systemsUnlocked){
+    print("你还没有获得契约系统。","red");
+    return;
+  }
+  if(!hasItem("契约卷轴")){
+    print("你没有契约卷轴。","red");
+    return;
+  }
+  if(!isDangerTime()){
+    print("契约卷轴只有在 03:00-07:00 之间能吸引鬼到来。","red");
+    return;
+  }
+  if(player.ghosts.length >= ghostCapacity()){
+    print("你的御鬼位已满。","red");
+    return;
+  }
+  const available = rookieGhostIds.filter(id => !player.ghosts.some(ghost => ghost.id === id));
+  if(!available.length){
+    print("附近已经没有适合新手契约的鬼。","yellow");
+    return;
+  }
+  const id = available[Math.floor(Math.random() * available.length)];
+  const ghost = ghostBook[id];
+  print("");
+  print("你撕开契约卷轴，纸灰逆着风飘向天花板。","purple");
+  print(`${ghost.name} 被吸引而来。${ghost.desc}`,"purple");
+  clearChoices();
+  addChoice(`契约 ${ghost.name}`,() => contractGhost(id));
+  addChoice("放弃契约",() => {
+    print("你收回卷轴，鬼影慢慢退进墙里。");
+    apartmentHub();
+  });
+}
+
+function ghostCapacity(){
+  if(player.exorcistLevel >= 9) return 4;
+  if(player.exorcistLevel >= 6) return 3;
+  if(player.exorcistLevel >= 3) return 2;
+  if(player.exorcistLevel >= 1) return 1;
+  return 0;
+}
+
+function removeItem(name){
+  const index = player.inventory.indexOf(name);
+  if(index >= 0){
+    player.inventory.splice(index,1);
+    return true;
+  }
+  return false;
+}
+
+function useGhost(index){
+  const ghost = player.ghosts[index];
+  if(!ghost) return;
+  if(player.ghostQi < 10){
+    print("鬼气不足，你无法稳定驾驭契约鬼。污染开始反噬。","red");
+    changeStats({pollution:10});
+    return;
+  }
+
+  print(`你借用了 ${ghost.name} 的力量。`,"purple");
+  player.ghostQi = Math.max(0, player.ghostQi - 10);
+  changeStats({sanity:-ghost.instability,pollution:ghost.power});
+
+  if(Math.random() < ghost.instability / 100){
+    print("契约反噬。你的影子短暂地不属于你。","red");
+    changeStats({sanity:-20,pollution:20});
+  }
+
+  saveGame();
+  renderBag();
+}
+
+function levelUpExorcist(){
+  if(player.qiAbsorbed < realmQiCap()){
+    print("经验值还没有达到当前境界上限。","red");
+    return;
+  }
+  if(player.exorcistLevel === 1 && !player.flags.hospitalTrialCleared){
+    print("突破二阶需要先通过规则怪谈试炼：诡秘医院。","yellow");
+    startHospitalTrial();
+    return;
+  }
+  player.exorcistLevel += 1;
+  player.spirit += 20;
+  player.maxGhostQi += 20;
+  player.ghostQi = player.maxGhostQi;
+  player.sanity = maxSanity();
+  player.qiAbsorbed = 0;
+  print(`[ LEVEL ] 御鬼师等级提升至 ${player.exorcistLevel} 级。精神 +20，鬼气上限 +20。`,"green");
+  updateStatus();
+  saveGame();
+}
+
+function tasks(){
+  if(!player.flags.systemsUnlocked){
+    renderOldPhone();
+    return;
+  }
+  phoneBody.innerHTML = "<b>当前任务</b>";
+  player.tasks.forEach(task => {
+    const row = document.createElement("div");
+    row.className = "row";
+    row.innerText = `${task.done ? "[完成]" : "[进行]"} ${task.title} ｜ ${describeReward(task)}`;
+    phoneBody.appendChild(row);
+  });
+  addPhoneBack();
+}
+
+function teleportUI(){
+  if(!player.flags.systemsUnlocked){
+    renderOldPhone();
+    return;
+  }
+  phoneBody.innerHTML = "<b>传送点</b>";
+  ["出租屋","闹鬼医院","地铁","黑市"].forEach(locationName => {
+    const row = document.createElement("div");
+    row.className = "row";
+    const label = document.createElement("span");
+    label.innerText = locationName;
+    const btn = document.createElement("button");
+    btn.className = "miniBtn";
+    btn.innerText = "前往";
+    btn.onclick = () => {
+      enterLocation(locationName);
+      print(`[ TERMINAL ] 已传送至：${locationName}`,"green");
+      closePhone();
+      saveGame();
+    };
+    row.appendChild(label);
+    row.appendChild(btn);
+    phoneBody.appendChild(row);
+  });
+  addPhoneBack();
+}
+
+function shop(){
+  if(!player.flags.systemsUnlocked){
+    renderOldPhone();
+    return;
+  }
+  phoneBody.innerHTML = "<b>黑市商店</b>";
+
+  const coinLine = document.createElement("div");
+  coinLine.className = "muted";
+  coinLine.style.margin = "8px 0 12px";
+  coinLine.innerText = `当前鬼币：${player.ghostCoins}`;
+  phoneBody.appendChild(coinLine);
+
+  renderShopItem("契约卷轴",30,"吸引鬼并尝试建立契约。后续契约玩法会继续扩展。");
+  renderShopItem("安神药",15,"恢复 15 点理智。");
+  renderShopItem("镇魂丸",55,"战斗中恢复 45 点理智，药劲更稳。");
+  renderShopItem("回气香",70,"战斗中恢复 60 点鬼气。");
+  renderShopItem("清心香",95,"战斗中恢复 35 点理智与 35 点鬼气。");
+  if(getRelic("不详的手术刀")){
+    renderShopItem("修复不详的手术刀",25,"消耗鬼币，将不详的手术刀耐久修复至 20。");
+  }
+
+  addPhoneBack();
+}
+
+function renderShopItem(name,price,desc){
+  const row = document.createElement("div");
+  row.className = "row";
+  const label = document.createElement("span");
+  label.innerText = `${name} ｜ ${price} 鬼币\n${desc}`;
+  const btn = document.createElement("button");
+  btn.className = "miniBtn";
+  btn.innerText = "购买";
+  btn.onclick = () => buyShopItem(name,price);
+  row.appendChild(label);
+  row.appendChild(btn);
+  phoneBody.appendChild(row);
+}
+
+function buyShopItem(name,price){
+  if(player.ghostCoins < price){
+    print("鬼币不足。","red");
+    return;
+  }
+  player.ghostCoins -= price;
+  if(name === "修复不详的手术刀"){
+    const relic = getRelic("不详的手术刀");
+    if(relic) relic.durability = relic.maxDurability;
+  }else{
+    addItem(name);
+  }
+  print(`[ SHOP ] 购买：${name}`,"green");
+  saveGame();
+  shop();
+}
+
+function apartmentHub(){
+  clearChoices();
+  print("");
+  print("你回到出租屋。这里仍旧阴冷，但终端确认：当前房间暂时稳定。","green");
+  print("你可以在这里休整，但 03:00-07:00 之间睡觉非常危险。","yellow");
+  addChoice("睡 1 小时",sleepOneHour);
+  addChoice("看电视新闻",watchTV);
+  addChoice("打坐恢复鬼气",meditate);
+  addChoice("使用契约卷轴",attractContractGhost);
+  addChoice("突破境界",levelUpExorcist,{disabled:player.qiAbsorbed < realmQiCap()});
+  addChoice("前往闹鬼医院",hospitalHub,{disabled:player.ghosts.length === 0});
+  addChoice("打开终端",openPhone);
+  addChoice("背包",openBag);
+  addChoice("保存",saveGame);
+}
+
+function sleepOneHour(){
+  if(player.location !== "出租屋"){
+    print("你只能在出租屋睡觉。","red");
+    return;
+  }
+
+  print("");
+  print("你躺到床上，强迫自己闭眼。");
+  advanceTime(60,"你睡了 1 小时");
+  if(isDangerTime(player.time - 30)){
+    print("梦里有人坐在床边，一遍遍念你的名字。","red");
+    changeStats({sanity:-35,pollution:12});
+  }else{
+    changeStats({sanity:10});
+    print("你醒来后，理智恢复了 10 点。","green");
+  }
+  if(player.gameOver) return;
+  saveGame();
+  apartmentHub();
+}
+
+function watchTV(){
+  if(player.location !== "出租屋"){
+    print("你需要回到出租屋才能看电视。","red");
+    return;
+  }
+  const news = [
+    "新闻：14 栋公寓已因煤气泄漏封锁，但画面里的警戒线后站满了没有脸的人。",
+    "新闻：御神发布夜间异常提醒，03:00-07:00 请避免睡眠、照镜、乘坐电梯。",
+    "新闻：黑市鬼币汇率小幅波动，契约卷轴价格保持稳定。",
+    "新闻：一名幸存者称，鬼无法被杀死，只有鬼能逼退鬼。",
+    "新闻：本市失踪人口统计中，凌晨三点后的记录出现大量空白。"
+  ];
+  print("");
+  print(news[Math.floor(Math.random() * news.length)],"yellow");
+  advanceTime(15,"你看了一会儿电视");
+  changeStats({pollution:0.5});
+  saveGame();
+}
+
+function meditate(){
+  if(player.location !== "出租屋"){
+    print("你需要回到出租屋才能打坐。","red");
+    return;
+  }
+  print("");
+  print("你盘腿坐下，按照御神终端里的呼吸节奏压住鬼气。");
+  advanceTime(30,"你打坐了半小时");
+  const recover = player.maxGhostQi > 0 ? 20 : 0;
+  player.ghostQi = Math.min(player.maxGhostQi, player.ghostQi + recover);
+  player.pollution = Math.max(0, player.pollution - 8);
+  print(`鬼气恢复 ${recover}，污染值降低 8。`,"green");
+  updateStatus();
+  saveGame();
+}
+
+function hospitalHub(){
+  clearChoices();
+  closePhone();
+  closeBag();
+  setLocation("闹鬼医院");
+  print("");
+  print("闹鬼医院的急诊大厅亮着惨白的灯，分诊台后没有人。","red");
+  print("御神终端标记：新手打怪区域。目标：击杀 10 个鬼物。","yellow");
+  addChoice("搜寻鬼物",startHospitalCombat,{disabled:player.ghosts.length === 0});
+  addChoice("突破试炼：诡秘医院",startHospitalTrial,{disabled:player.exorcistLevel !== 1 || player.qiAbsorbed < realmQiCap() || player.flags.hospitalTrialCleared});
+  addChoice("返回出租屋",() => enterLocation("出租屋"));
+  addChoice("打开终端",openPhone);
+  addChoice("背包",openBag);
+  saveGame();
+}
+
+function startHospitalCombat(){
+  if(player.ghosts.length === 0){
+    print("没有契约鬼，你无法对付鬼物。","red");
+    return;
+  }
+  const template = hospitalEnemies[Math.floor(Math.random() * hospitalEnemies.length)];
+  combat = {
+    enemy:Object.assign({},template,{hp:template.maxHp,statuses:{stun:0,weaken:0,vulnerable:0,bleed:0}}),
+    playerStatuses:{stun:0,shield:0,qiTax:0,sanityCapDown:0},
+    turn:1,
+    log:[]
+  };
+  clearChoices();
+  print("");
+  print(`${template.name} 从病房深处走了出来。`,"red");
+  renderCombat();
+}
+
+function renderCombat(){
+  if(!combat) return;
+  clearChoices();
+  const enemy = combat.enemy;
+  const ghost = player.ghosts[0];
+  print("");
+  print("========== 战斗 ==========","yellow");
+  print(`回合 ${combat.turn} ｜ 地点：${player.location}`);
+  print(`[敌] ${enemy.name}`);
+  print(`HP ${bar(enemy.hp,enemy.maxHp)} ${Math.max(0,Math.floor(enemy.hp))}/${enemy.maxHp}`);
+  print(`状态：${statusText(enemy.statuses)} ｜ 技能倾向：${enemy.skill}`);
+  print("");
+  print(`[你] ${player.name || "匿名者"} ｜ 契约鬼：${ghost.name}`);
+  print(`理智 ${bar(player.sanity,maxSanity())} ${Math.floor(player.sanity)}/${maxSanity()}`);
+  print(`鬼气 ${bar(player.ghostQi,player.maxGhostQi)} ${Math.floor(player.ghostQi)}/${player.maxGhostQi}`);
+  print(`状态：护盾 ${combat.playerStatuses.shield} ｜ ${statusText(combat.playerStatuses)}`);
+  print("==========================","yellow");
+
+  if(combat.playerStatuses.stun > 0){
+    addChoice("被眩晕，跳过回合",() => {
+      combat.playerStatuses.stun -= 1;
+      enemyTurn();
+    });
+    return;
+  }
+
+  ghost.skills.forEach(skill => {
+    addChoice(`${skill.name} / ${skillCost(skill.cost)}鬼气`,() => useCombatSkill(skill.id));
+  });
+  addChoice("使用补给",openCombatItems,{disabled:!hasCombatItem()});
+  addChoice("使用鬼器",useRelicSkill,{disabled:!getRelic("不详的手术刀") || getRelic("不详的手术刀").durability <= 0});
+  addChoice("逃跑",fleeCombat);
+}
+
+function bar(value,max){
+  const total = 10;
+  const safeMax = Math.max(1,max);
+  const fill = Math.max(0,Math.min(total,Math.round((value / safeMax) * total)));
+  return `[${"#".repeat(fill)}${".".repeat(total - fill)}]`;
+}
+
+function statusText(statuses){
+  const parts = Object.keys(statuses).filter(key => statuses[key] > 0).map(key => `${key}:${statuses[key]}`);
+  return parts.length ? parts.join(" ") : "无";
+}
+
+function skillCost(base){
+  let cost = base;
+  if(player.ghosts[0] && player.ghosts[0].id === "seamWraith") cost *= 0.85;
+  if(combat && combat.playerStatuses.qiTax > 0) cost *= 1.25;
+  return Math.ceil(cost);
+}
+
+function useCombatSkill(skillId){
+  if(!combat) return;
+  const skill = player.ghosts[0].skills.find(item => item.id === skillId);
+  if(!skill) return;
+  const cost = skillCost(skill.cost);
+  if(player.ghostQi < cost){
+    print("鬼气不足，技能释放失败。污染反噬。","red");
+    changeStats({pollution:8});
+    enemyTurn();
+    return;
+  }
+  player.ghostQi -= cost;
+  resolveGhostSkill(skillId);
+  if(checkEnemyDefeated()) return;
+  enemyTurn();
+}
+
+function resolveGhostSkill(skillId){
+  const enemy = combat.enemy;
+  const vulnerable = enemy.statuses.vulnerable > 0 ? 1.15 : 1;
+  let damage = 0;
+
+  if(skillId === "mindShock"){
+    damage = (22 + enemy.spirit * 0.1 + 20) * vulnerable;
+    enemy.statuses.stun = Math.max(enemy.statuses.stun,1);
+    print(`鬼眼睁开，精神震荡命中，造成 ${Math.floor(damage)} 伤害，并眩晕敌人。`,"purple");
+  }else if(skillId === "weakPoint"){
+    damage = 30 * vulnerable;
+    enemy.statuses.weaken = Math.max(enemy.statuses.weaken,1);
+    print(`你窥破弱点，造成 ${Math.floor(damage)} 伤害，敌人下次伤害降低。`,"purple");
+  }else if(skillId === "terrorGaze"){
+    damage = 24 * vulnerable;
+    enemy.statuses.vulnerable = Math.max(enemy.statuses.vulnerable,2);
+    print(`恐惧凝视压住敌人，造成 ${Math.floor(damage)} 伤害，并施加脆弱。`,"purple");
+  }else if(skillId === "blackSuture"){
+    damage = 28 * vulnerable;
+    enemy.statuses.bleed = Math.max(enemy.statuses.bleed,2);
+    print(`黑线缝进鬼物体内，造成 ${Math.floor(damage)} 伤害，并附加流血。`,"purple");
+  }else if(skillId === "limbBind"){
+    damage = 18 * vulnerable;
+    if(Math.random() < 0.7) enemy.statuses.stun = Math.max(enemy.statuses.stun,1);
+    print(`缝尸线牵住四肢，造成 ${Math.floor(damage)} 伤害。`,"purple");
+  }else if(skillId === "borrowedPulse"){
+    damage = 24 * vulnerable;
+    changeStats({sanity:12});
+    print(`你借来一截死者脉搏，造成 ${Math.floor(damage)} 伤害，并恢复理智。`,"purple");
+  }else if(skillId === "ashWard"){
+    damage = 8 * vulnerable;
+    combat.playerStatuses.shield += 24;
+    print("灰烬伞撑开灰幕，你获得 24 护盾。","purple");
+  }else if(skillId === "rainNeedles"){
+    damage = 26 * vulnerable;
+    enemy.statuses.weaken = Math.max(enemy.statuses.weaken,2);
+    print(`阴雨化针落下，造成 ${Math.floor(damage)} 伤害，并削弱敌人。`,"purple");
+  }else if(skillId === "burialWind"){
+    damage = (enemy.hp / enemy.maxHp < 0.35 ? 42 : 30) * vulnerable;
+    print(`送葬风掠过病房，造成 ${Math.floor(damage)} 伤害。`,"purple");
+  }
+  enemy.hp -= damage;
+  changeStats({pollution:1.5});
+}
+
+function enemyTurn(){
+  if(!combat) return;
+  const enemy = combat.enemy;
+  applyEnemyBleed();
+  if(checkEnemyDefeated()) return;
+  if(enemy.statuses.stun > 0){
+    print(`${enemy.name} 被眩晕，无法行动。`,"green");
+    enemy.statuses.stun -= 1;
+    endCombatRound();
+    return;
+  }
+  let damage = enemy.attack + Math.floor(enemy.spirit * 0.04);
+  if(enemy.statuses.weaken > 0) damage *= 0.8;
+  if(combat.playerStatuses.shield > 0){
+    const blocked = Math.min(combat.playerStatuses.shield,damage);
+    combat.playerStatuses.shield -= blocked;
+    damage -= blocked;
+    print(`护盾抵挡 ${Math.floor(blocked)} 点伤害。`,"green");
+  }
+  if(damage > 0){
+    print(`${enemy.name} 使用 ${enemy.skill}，你的理智降低 ${Math.floor(damage)}。`,"red");
+    changeStats({sanity:-damage,pollution:2});
+  }
+  if(Math.random() < 0.18){
+    combat.playerStatuses.qiTax = Math.max(combat.playerStatuses.qiTax,2);
+    print("阴冷针孔扎进你的手臂：鬼气消耗增加 2 回合。","red");
+  }
+  if(player.gameOver) return;
+  endCombatRound();
+}
+
+function endCombatRound(){
+  if(!combat) return;
+  tickStatuses(combat.enemy.statuses);
+  tickStatuses(combat.playerStatuses);
+  combat.turn += 1;
+  renderCombat();
+}
+
+function tickStatuses(statuses){
+  Object.keys(statuses).forEach(key => {
+    if(statuses[key] > 0 && key !== "shield") statuses[key] -= 1;
+  });
+}
+
+function applyEnemyBleed(){
+  if(combat.enemy.statuses.bleed > 0){
+    combat.enemy.hp -= 8;
+    print(`${combat.enemy.name} 的伤口渗出黑血，受到 8 点流血伤害。`,"red");
+  }
+}
+
+function checkEnemyDefeated(){
+  if(!combat || combat.enemy.hp > 0) return false;
+  const enemy = combat.enemy;
+  print(`${enemy.name} 被你的契约鬼撕开，化成一缕冰冷鬼气。`,"green");
+  finishHospitalKill(enemy);
+  combat = null;
+  clearChoices();
+  addChoice("继续搜寻",startHospitalCombat);
+  addChoice("返回出租屋",() => enterLocation("出租屋"));
+  addChoice("保存",saveGame);
+  return true;
+}
+
+function finishHospitalKill(enemy){
+  player.hospitalKills += 1;
+  const coins = randomInt(enemy.coins[0],enemy.coins[1]);
+  addGhostCoins(coins);
+  absorbQi(enemy.qiGain);
+  maybeDropHospitalRelic();
+  if(player.hospitalKills >= 10) completeTask("hospital_hunt");
+  saveGame();
+}
+
+function absorbQi(amount){
+  const cap = realmQiCap();
+  const accepted = Math.min(amount,cap - player.qiAbsorbed);
+  if(accepted <= 0){
+    print("当前境界经验值已满，需要完成规则怪谈试炼后才能突破。","yellow");
+    return;
+  }
+  player.qiAbsorbed += accepted;
+  print(`[ 经验值 ] +${accepted}。`,"green");
+  if(player.qiAbsorbed >= cap){
+    print("当前境界经验值已满。下一步需要完成一次规则怪谈试炼才能突破。","yellow");
+  }
+}
+
+function realmQiCap(){
+  const caps = {1:120,2:260,3:460,4:720,5:1050,6:1450,7:1950,8:2600};
+  return caps[player.exorcistLevel] || 3400;
+}
+
+function maybeDropHospitalRelic(){
+  if(player.flags.hospitalRelicDropped) return;
+  if(Math.random() >= 0.001) return;
+  player.flags.hospitalRelicDropped = true;
+  player.relics.push({id:"ominousScalpel",name:"不详的手术刀",durability:20,maxDurability:20});
+  print("[ 稀有掉落 ] 你获得鬼器：不详的手术刀。","purple");
+}
+
+function getRelic(name){
+  return player.relics.find(relic => relic.name === name);
+}
+
+function useRelicSkill(){
+  const relic = getRelic("不详的手术刀");
+  if(!combat || !relic || relic.durability <= 0) return;
+  relic.durability -= 1;
+  const damage = 34 + Math.floor(player.spirit * 0.05);
+  combat.enemy.hp -= damage;
+  print(`你挥动不详的手术刀切开鬼物，造成 ${damage} 伤害。耐久 -1。`,"purple");
+  if(checkEnemyDefeated()) return;
+  enemyTurn();
+}
+
+function useMedicine(){
+  useCombatItem("安神药");
+}
+
+function hasCombatItem(){
+  return ["安神药","镇魂丸","回气香","清心香"].some(hasItem);
+}
+
+function openCombatItems(){
+  clearChoices();
+  print("");
+  print("[ 战斗补给 ] 选择要使用的物品。","yellow");
+  addChoice("安神药 / 理智+35",() => useCombatItem("安神药"),{disabled:!hasItem("安神药")});
+  addChoice("镇魂丸 / 理智+45",() => useCombatItem("镇魂丸"),{disabled:!hasItem("镇魂丸")});
+  addChoice("回气香 / 鬼气+60",() => useCombatItem("回气香"),{disabled:!hasItem("回气香")});
+  addChoice("清心香 / 理智+35 鬼气+35",() => useCombatItem("清心香"),{disabled:!hasItem("清心香")});
+  addChoice("返回战斗",renderCombat);
+}
+
+function useCombatItem(name){
+  if(!hasItem(name)){
+    print(`你没有${name}。`,"red");
+    renderCombat();
+    return;
+  }
+  removeItem(name);
+  if(name === "安神药"){
+    changeStats({sanity:35});
+    print("你吞下安神药，理智恢复 35。","green");
+  }else if(name === "镇魂丸"){
+    changeStats({sanity:45});
+    print("镇魂丸在舌根化开，理智恢复 45。","green");
+  }else if(name === "回气香"){
+    player.ghostQi = Math.min(player.maxGhostQi,player.ghostQi + 60);
+    print("回气香燃起冷烟，鬼气恢复 60。","green");
+    updateStatus();
+  }else if(name === "清心香"){
+    changeStats({sanity:35});
+    player.ghostQi = Math.min(player.maxGhostQi,player.ghostQi + 35);
+    print("清心香压住杂念，理智恢复 35，鬼气恢复 35。","green");
+    updateStatus();
+  }
+  enemyTurn();
+}
+
+function fleeCombat(){
+  if(Math.random() < 0.65){
+    print("你冲出病房，暂时摆脱了鬼物。","green");
+    combat = null;
+    hospitalHub();
+  }else{
+    print("逃跑失败。门牌号在你眼前融化。","red");
+    enemyTurn();
+  }
+}
+
+function randomInt(min,max){
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function trialRuleBreak(text,{sanity=16,pollution=6,attackChance=0.45,lethal=false}={}){
+  if(lethal){
+    ruleViolation(text,{lethal:true});
+    return;
+  }
+  print(`[ 规则偏移 ] ${text}`,"red");
+  player.violations += 1;
+  changeStats({sanity:-Math.floor(sanity * 0.55),pollution});
+  if(Math.random() < attackChance){
+    const damage = randomInt(14,28);
+    print(`病房里的鬼物被你的错误吸引，发动袭击。理智额外降低 ${damage}。`,"red");
+    changeStats({sanity:-damage,pollution:4});
+  }else{
+    print("墙上的白色涂层鼓起又落下，这次它没有完全醒来。","yellow");
+  }
+}
+
+function startHospitalTrial(){
+  if(player.exorcistLevel !== 1){
+    print("当前只有二阶突破试炼开放。","yellow");
+    return;
+  }
+  if(player.qiAbsorbed < realmQiCap()){
+    print("经验值不足，无法开启突破试炼。","red");
+    return;
+  }
+  if(player.flags.hospitalTrialCleared){
+    print("你已经通过诡秘医院试炼。","green");
+    return;
+  }
+  clearChoices();
+  closePhone();
+  closeBag();
+  setLocation("诡秘医院");
+  print("");
+  print("你醒来时，已经在医院病床上。");
+  print("灯是绿的，墙是白的，但白得不太对劲，像刷新失败的网页。");
+  print("床头贴着一张纸：");
+  print("《患者守则》请务必遵守，否则后果自负","yellow");
+  print("旁边还有一句手写小字：如果你看到我，请装作没看到我。");
+  print("署名的位置被涂黑。","red");
+  print("");
+  print("规则1：护士不笑时，立刻闭眼10秒。");
+  print("规则2：晚上11点后看走廊前，先确认房间里有几张床。");
+  print("规则3：药片必须吃，颜色不重要。");
+  print("规则4：广播念到你的名字，不要回应。连续念三次代表你被登记为可出院对象。");
+  print("规则5：电梯永远停在3楼，显示4楼以上不要进入。");
+  print("规则6：镜子里的你点头可以信，摇头离开房间，微笑立刻换房。");
+  print("规则7：不要和404病房的人说话。");
+  addChoice("开始查房",trialNurse);
+  addChoice("强行醒来",() => {
+    print("你试图醒来，却发现病床安全带已经扣上。","red");
+    trialRuleBreak("试炼开始后试图强行醒来。",{sanity:18,pollution:6,attackChance:0.35});
+    trialNurse();
+  });
+}
+
+function trialNurse(){
+  clearChoices();
+  print("");
+  print("护士推门进来。她一直在笑。");
+  print("她翻了翻你的病历，笑容忽然消失了。","red");
+  addChoice("立刻闭眼10秒",() => {
+    print("黑暗里，护士重新学会了微笑。","green");
+    trialMedicine();
+  });
+  addChoice("盯着她看",() => {
+    trialRuleBreak("护士不笑时仍盯着她看。",{sanity:24,pollution:10,attackChance:0.6});
+    trialMedicine();
+  });
+  addChoice("问她为什么不笑",() => {
+    trialRuleBreak("你让护士意识到自己不该被看见。",{sanity:32,pollution:12,attackChance:0.75});
+    trialMedicine();
+  });
+}
+
+function trialMedicine(){
+  clearChoices();
+  print("");
+  print("医生送来三颗药：白色、红色、黑色。");
+  print("他说：颜色不是药效，只是建议。");
+  addChoice("吃白色药片",() => {
+    print("白色药片像粉笔灰一样干。你勉强吞下。","green");
+    changeStats({sanity:8,pollution:2});
+    trialHallway();
+  });
+  addChoice("吃红色药片",() => {
+    print("红色药片让你的心跳快得像走廊灯闪烁。","yellow");
+    advanceTime(30,"药效加速了剧情");
+    changeStats({sanity:-8,pollution:4});
+    trialHallway();
+  });
+  addChoice("吃黑色药片",() => {
+    print("你先祈祷，然后吞下黑色药片。祈祷没有完全浪费。","purple");
+    changeStats({sanity:-14,pollution:8});
+    player.ghostQi = Math.min(player.maxGhostQi,player.ghostQi + 15);
+    trialHallway();
+  });
+  addChoice("拒绝吃药",() => {
+    trialRuleBreak("药片必须吃。",{sanity:35,pollution:15,attackChance:0.65});
+    trialHallway();
+  });
+}
+
+function trialHallway(){
+  clearChoices();
+  print("");
+  print("广播响了。它念出了你的名字。");
+  print("第一次。第二次。第三次。","red");
+  addChoice("保持沉默",() => {
+    print("广播卡住了，开始播放一段不存在的出院铃。","green");
+    trialBeds();
+  });
+  addChoice("回应：我在",() => {
+    trialRuleBreak("广播念到你的名字时回应。",{lethal:true});
+  });
+}
+
+function trialBeds(){
+  clearChoices();
+  print("");
+  print("现在是 23:17。你必须看一眼走廊，但规则要求先确认床数。");
+  print("你回头，房间里出现了第二张床。","red");
+  addChoice("钻进被子假装不存在",() => {
+    print("走廊里的脚步经过门口，没有发现你。","green");
+    trialMirror();
+  });
+  addChoice("直接看走廊",() => {
+    trialRuleBreak("两张床时仍看向走廊。",{sanity:30,pollution:12,attackChance:0.7});
+    trialMirror();
+  });
+}
+
+function trialMirror(){
+  clearChoices();
+  print("");
+  print("洗手间镜子里的你先一步抬头。");
+  const sign = ["点头","摇头","微笑"][Math.floor(Math.random() * 3)];
+  print(`镜子里的你正在${sign}。`,"purple");
+  if(sign === "点头"){
+    addChoice("相信镜子，继续",trial404);
+  }else if(sign === "摇头"){
+    addChoice("立刻离开房间",trial404);
+    addChoice("继续照镜子",() => {
+      trialRuleBreak("镜中人摇头时没有离开。",{sanity:28,pollution:10,attackChance:0.55});
+      trial404();
+    });
+  }else{
+    addChoice("当场换房间",trial404);
+    addChoice("对镜子微笑",() => {
+      trialRuleBreak("镜中人微笑时回应它。",{sanity:34,pollution:14,attackChance:0.8});
+      trial404();
+    });
+  }
+}
+
+function trial404(){
+  clearChoices();
+  print("");
+  print("电话响了。听筒里有人说：我在404等你。","red");
+  addChoice("回答：我今天不上线",() => {
+    print("电话那头沉默了很久，然后传来断线声。","green");
+    trialElevator();
+  });
+  addChoice("问他是谁",() => {
+    trialRuleBreak("你和404病房的人说话。",{lethal:true});
+  });
+}
+
+function trialElevator(){
+  clearChoices();
+  print("");
+  print("电梯门打开，显示屏停在 5 楼。");
+  addChoice("不进入电梯，走安全通道",clearHospitalTrial);
+  addChoice("进入电梯并按1楼后闭嘴",() => {
+    print("电梯没有下降，只是把你吐回病房门口。你活着。","green");
+    clearHospitalTrial();
+  });
+  addChoice("进入电梯并追问为什么是5楼",() => {
+    trialRuleBreak("电梯显示4楼以上时进入并说话。",{lethal:true});
+  });
+}
+
+function clearHospitalTrial(){
+  clearChoices();
+  player.flags.hospitalTrialCleared = true;
+  completeTask("breakthrough_2");
+  print("");
+  print("病房墙面开始脱落，露出背后的御神符文。","purple");
+  print("你通过了诡秘医院试炼。");
+  levelUpExorcist();
+  addChoice("返回出租屋",() => enterLocation("出租屋"));
+  addChoice("保存",saveGame);
+}
+
+function codex(){
+  if(!player.flags.systemsUnlocked){
+    renderOldPhone();
+    return;
+  }
+  phoneBody.innerHTML = "<b>异常图鉴</b>";
+  player.codex.forEach(id => {
+    const ghost = ghostBook[id];
+    if(!ghost) return;
+    const box = document.createElement("div");
+    box.className = "section";
+    const skills = ghost.skills ? ghost.skills.map(skill => `- ${skill.name}：${skill.desc}`).join("\n") : "";
+    box.innerText = `${ghost.name}\n力量:${ghost.power} 失控:${ghost.instability}\n被动：${ghost.passive || "无"}\n${ghost.desc}${skills ? "\n技能：\n" + skills : ""}`;
+    phoneBody.appendChild(box);
+  });
+  addPhoneBack();
+}
+
+function addPhoneBack(){
+  const back = document.createElement("button");
+  back.className = "miniBtn";
+  back.style.marginTop = "14px";
+  back.innerText = "返回";
+  back.onclick = renderPhoneHome;
+  phoneBody.appendChild(back);
+}
+
+function login(){
+  clearChoices();
+  print("请输入你的名字。");
+
+  const input = document.createElement("input");
+  input.className = "inputLine";
+  input.placeholder = "匿名者";
+  choices.appendChild(input);
+
+  const btn = document.createElement("button");
+  btn.innerText = "进入游戏";
+  btn.onclick = () => {
+    player.name = input.value.trim() || "匿名者";
+    updateStatus();
+    saveGame();
+    startIntro();
+  };
+  choices.appendChild(btn);
+  input.focus();
+}
+
+function startIntro(){
+  clearChoices();
+  closePhone();
+  closeBag();
+
+  print("");
+  print("凌晨 2:44。");
+  print("你从噩梦中惊醒。");
+  print("出租屋的灯不断闪烁。");
+  print("你的旧手机突然震动。","purple");
+  print("");
+  print("【未知联系人】","red");
+  print("“不要看床底。”","red");
+  print("");
+
+  player.flags.introSeen = true;
+  if(player.time < 164) player.time = 164;
+  saveGame();
+
+  addChoice("查看房间",lookRoom);
+  addChoice("查看手机",checkPhone);
+  addChoice("检查门口",inspectDoor);
+  addChoice("查看床底",checkBed);
+  addChoice("直接开门",openDoorWithoutChecking);
+  addChoice("冲出房间",escapeRoom,{disabled:!player.flags.hasKey});
+  addChoice("查看旧手机",openPhone);
+  addChoice("背包",openBag);
+}
+
+function lookRoom(){
+  print("");
+  print("你观察着昏暗的出租屋。");
+  print("墙皮正在脱落，门缝外有水一样的黑影淌过。");
+  print("空气里弥漫着潮湿腐烂的味道。");
+  print("桌上压着一张被水泡软的物业通知。");
+  advanceTime(2,"你翻找房间");
+  addChoice("阅读物业通知",readNotice);
+  addChoice("翻抽屉",searchDrawer);
+}
+
+function readNotice(){
+  print("");
+  print("物业通知的抬头是：14 栋夜间安全守则。","yellow");
+  print("1. 02:50 后不要观察床底。");
+  print("2. 若走廊灯连续闪烁三次，请停止移动，默数十秒。");
+  print("3. 若猫眼里看见自己站在门外，请勿开门。");
+  print("4. 03:00 后，电梯只会去它想去的楼层。");
+  learnRule("no_bed","规则一：02:50 后不要观察床底。");
+  learnRule("hall_light","规则二：走廊灯连续闪烁三次时，停止移动并等待。");
+  learnRule("not_self","规则三：猫眼里看见自己时，不要开门。");
+  learnRule("no_elevator_after_three","规则四：03:00 后不要乘坐电梯。");
+  player.flags.foundRules = true;
+  advanceTime(2,"你记下通知");
+  saveGame();
+}
+
+function searchDrawer(){
+  print("");
+  if(player.flags.hasKey){
+    print("抽屉里只剩灰尘。");
+    advanceTime(1,"你又翻了一遍抽屉");
+    return;
+  }
+  print("抽屉卡住了。你用力拉开，里面有一把贴着黑胶带的门钥匙。","green");
+  addItem("门钥匙");
+  player.flags.hasKey = true;
+  advanceTime(3,"你找到了钥匙");
+  saveGame();
+  clearChoices();
+  addChoice("检查门口",inspectDoor);
+  addChoice("开门离开",escapeRoom);
+  addChoice("查看旧手机",openPhone);
+}
+
+function checkPhone(){
+  print("");
+  print("你打开手机。");
+  print("新的短信出现了。","red");
+  print("“它已经知道你醒了。”","red");
+  learnRule("no_bed","规则一：不要看床底。尤其不要在 02:50 之后看。");
+  learnRule("check_peephole","规则二：门外有人敲门时，先看猫眼，不要立刻开门。");
+  advanceTime(1,"你查看短信");
+  changeStats({pollution:5});
+  saveGame();
+}
+
+function checkBed(){
+  print("");
+  print("你缓缓低下头。");
+  advanceTime(1,"你靠近床沿");
+  if(player.time >= 170){
+    print("床底空无一物。");
+    print("下一秒，你听见自己的声音从床底说：违反规则。","red");
+    ruleViolation("02:50 后查看床底。",{sanity:25,pollution:15,lethal:isAfterThree()});
+  }else{
+    print("床底有一张苍白的人脸正在盯着你。","red");
+    print("它没有攻击，只是用口型说：先拿钥匙。","purple");
+    changeStats({sanity:-12,pollution:8});
+  }
+  saveGame();
+}
+
+function inspectDoor(){
+  print("");
+  print("你走到门口。门外有人轻轻敲了两下。");
+  print("咚。咚。");
+  advanceTime(1,"你贴近门口");
+  clearChoices();
+  addChoice("看猫眼",lookPeephole);
+  addChoice("不开门，等待",waitAtDoor);
+  addChoice("直接开门",openDoorWithoutChecking);
+  addChoice("回到房间",startIntro);
+}
+
+function lookPeephole(){
+  print("");
+  player.flags.checkedPeephole = true;
+  advanceTime(1,"你看向猫眼");
+  if(isAfterThree()){
+    print("猫眼里是一条没有尽头的走廊。你看见自己站在远处，对你招手。","red");
+    learnRule("not_self","规则三：猫眼里看见自己时，不要开门。");
+    clearChoices();
+    addChoice("不开门，等待",waitAtDoor);
+    addChoice("强行开门",() => ruleViolation("你给门外的自己开了门。",{lethal:true}));
+  }else{
+    print("猫眼外没有人，只有一张贴在门上的纸条：不要相信 14 楼。","yellow");
+    learnRule("no_14","规则五：不要前往 14 楼。");
+    clearChoices();
+    addChoice("用钥匙开门",escapeRoom,{disabled:!player.flags.hasKey});
+    addChoice("回房间找钥匙",startIntro);
+  }
+  saveGame();
+}
+
+function waitAtDoor(){
+  print("");
+  print("你屏住呼吸，没有开门。");
+  print("第三下敲门迟迟没有响起，门缝里的黑影慢慢退走。","green");
+  advanceTime(2,"你在门口等待");
+  clearChoices();
+  addChoice("用钥匙开门",escapeRoom,{disabled:!player.flags.hasKey});
+  addChoice("回房间",startIntro);
+  saveGame();
+}
+
+function openDoorWithoutChecking(){
+  print("");
+  advanceTime(1,"你握住门把手");
+  if(!player.flags.checkedPeephole){
+    ruleViolation("没有确认猫眼就开门。",{sanity:18,pollution:10});
+  }
+  if(!player.flags.hasKey){
+    print("门锁没有打开。你才想起钥匙不在身上。","red");
+    return;
+  }
+  escapeRoom();
+}
+
+function escapeRoom(){
+  if(!player.flags.hasKey){
+    print("门锁卡死了。你需要钥匙。","red");
+    return;
+  }
+  clearChoices();
+  setLocation("走廊");
+  completeTask("leave_room");
+  player.flags.escapedApartment = true;
+
+  print("");
+  print("你猛地冲出出租屋。");
+  print("走廊的声控灯忽明忽暗。");
+  print("灯闪了一次。");
+  print("灯闪了第二次。");
+  print("灯闪了第三次。","red");
+  print("电梯停在14楼。","red");
+  print("");
+  advanceTime(2,"你离开出租屋");
+
+  addChoice("停下等待十秒",waitInHallway);
+  addChoice("进入电梯",elevatorScene);
+  addChoice("走楼梯离开",stairsScene);
+  addChoice("继续往前跑",runThroughHallway);
+  addChoice("查看旧手机",openPhone);
+  addChoice("背包",openBag);
+  saveGame();
+}
+
+function waitInHallway(){
+  print("");
+  print("你停在原地，默数十秒。");
+  print("第十秒时，整条走廊像信号不良的录像一样跳了一帧。");
+  print("再睁眼，电梯不再显示 14 楼，而是 B1。","green");
+  player.flags.hallwayWaited = true;
+  advanceTime(1,"你遵守了走廊规则");
+  saveGame();
+}
+
+function runThroughHallway(){
+  print("");
+  print("你无视闪烁的灯，继续往前跑。");
+  ruleViolation("走廊灯闪烁三次后仍继续移动。",{sanity:20,pollution:12});
+  if(player.gameOver) return;
+  print("墙上的门牌全部变成了你的房号。","red");
+  advanceTime(2,"你在重复的走廊里奔跑");
+  saveGame();
+}
+
+function elevatorScene(){
+  clearChoices();
+
+  print("");
+  print("你进入了电梯。");
+  print("门缓缓关闭。");
+  advanceTime(2,"电梯门合上");
+
+  if(isAfterThree()){
+    print("按钮面板上只有一个数字：14。","red");
+    ruleViolation("03:00 后乘坐电梯。",{sanity:25,pollution:20,lethal:!player.flags.hallwayWaited});
+    if(player.gameOver) return;
+  }else{
+    print("电梯按钮里并没有14楼。","red");
+  }
+  print("");
+
+  changeStats({pollution:15});
+
+  addChoice("按1楼",() => {
+    print("");
+    advanceTime(1,"你按下 1 楼");
+    if(isAfterThree()){
+      print("电梯开始下降，但楼层数字停在 14。","red");
+      ruleViolation("电梯把你带向不存在的楼层。",{sanity:20,pollution:10});
+    }else{
+      print("电梯没有移动。");
+      print("你听见身后有人在呼吸。","red");
+    }
+    saveGame();
+  });
+
+  addChoice("回头",() => {
+    print("");
+    advanceTime(1,"你回头看向镜面");
+    print("你看见了镜子里的自己。");
+    print("但它没有和你做一样的动作。","red");
+    if(isAfterThree()){
+      ruleViolation("03:00 后相信镜子。",{sanity:30,pollution:18});
+    }else{
+      changeStats({sanity:-30});
+    }
+    saveGame();
+  });
+
+  addChoice("强行开门逃出",() => {
+    print("");
+    print("你用钥匙卡住电梯门，挤进安全通道。","green");
+    stairsScene();
+  });
+
+  saveGame();
+}
+
+function stairsScene(){
+  clearChoices();
+
+  print("");
+  print("你冲向安全通道。");
+  print("楼梯间一片漆黑。");
+  print("楼上传来了脚步声。","red");
+  print("");
+  advanceTime(2,"你进入楼梯间");
+
+  addChoice("继续下楼",() => {
+    clearChoices();
+    advanceTime(4,"你沿着楼梯往下跑");
+    setLocation("公寓门厅");
+    print("");
+    if(!player.flags.hallwayWaited && isAfterThree()){
+      print("你明明在下楼，却再次看见出租屋的门。","red");
+      ruleViolation("没有遵守走廊灯规则，楼梯不承认你的方向。",{sanity:22,pollution:15});
+      if(player.gameOver) return;
+    }
+    print("你冲出公寓大门，雨落在空无一人的街上。","green");
+    afterApartmentStreet();
+    saveGame();
+  });
+
+  addChoice("停下听脚步声",() => {
+    print("");
+    print("你停下后，楼上的脚步声也停下了。");
+    print("几秒后，它开始模仿你的呼吸。","red");
+    advanceTime(1,"你在楼梯间等待");
+    changeStats({sanity:-8,pollution:4});
+    saveGame();
+  });
+
+  addChoice("返回走廊",escapeRoom);
+  saveGame();
+}
+
+function afterApartmentStreet(){
+  clearChoices();
+  setLocation("街道");
+  player.flags.escapedApartment = true;
+  print("");
+  print("街角的 24 小时便利店亮着灯，玻璃门上贴着一张纸：");
+  print("“想活到天亮，就进来。”","yellow");
+  print("");
+  addChoice("进入便利店",meetNpc);
+  addChoice("留在雨里",() => {
+    print("");
+    print("雨水打在身上，你发现每一滴都带着公寓走廊里的腥味。","red");
+    ruleViolation("逃离后仍停留在公寓影响范围。",{sanity:16,pollution:10});
+    saveGame();
+  });
+  addChoice("查看旧手机",openPhone);
+  addChoice("背包",openBag);
+  saveGame();
+}
+
+function meetNpc(){
+  clearChoices();
+  setLocation("便利店");
+  player.flags.metNpc = true;
+  completeTask("meet_npc");
+
+  print("");
+  print("便利店里只有一个穿灰色雨衣的人。");
+  print("他把一台黑色终端推到你面前。","purple");
+  print("“我是官方组织‘御神’的接应者。”","yellow");
+  print("“你能从那栋楼里活着出来，不是运气。你是罕见的通灵体质。”");
+  print("“鬼无法被杀死。现实里的刀、枪、火都只能拖延它们。”");
+  print("“只有鬼可以对付鬼。御鬼师要做的，就是驾驭鬼，用鬼去和鬼战斗。”","purple");
+  print("“御鬼师共有九个等级。1、3、6、9级时，分别会开启新的御鬼位。”");
+  print("“你现在是1级，只能驾驭一只鬼。别贪心，贪心的人通常死得很完整。”","red");
+  unlockSystems();
+  print("===== 第一章结束：终端系统已解锁 =====","green");
+  print("");
+  addChoice("打开终端",openPhone);
+  addChoice("背包",openBag);
+  addChoice("保存",saveGame);
+  saveGame();
+}
+
+function unlockSystems(){
+  if(player.flags.systemsUnlocked) return;
+  player.flags.systemsUnlocked = true;
+  player.chapter = 2;
+  addItem("神秘终端");
+  if(!hasItem("契约卷轴")) addItem("契约卷轴");
+  learnRule("contract_warning","新规则：契约可以救命，也会污染你。");
+  print("[ 御神 ] 新手任务奖励已发放：契约卷轴。","green");
+  updateStatus();
+}
+
+function mainMenu(){
+  output.innerHTML = "";
+  clearChoices();
+  updateStatus();
+  print("《都市异闻录：鬼契约》","green");
+  print("");
+  print("第一章：逃离公寓。");
+  print("规则会保护你，也会杀死你。03:00 以后危险翻倍。","muted");
+  print("");
+  addChoice("新游戏",newGame);
+  addChoice("读取存档",loadGame);
+}
+
+function registerScene(name,handler){
+  scenes[name] = handler;
+}
+
+function goScene(name){
+  if(typeof scenes[name] === "function"){
+    scenes[name]();
+  }else{
+    print(`场景不存在：${name}`,"red");
+  }
+}
+
+registerScene("intro",startIntro);
+registerScene("escapeRoom",escapeRoom);
+registerScene("elevator",elevatorScene);
+registerScene("stairs",stairsScene);
+registerScene("street",afterApartmentStreet);
+registerScene("npc",meetNpc);
+registerScene("hospitalTrial",startHospitalTrial);
+
+window.UrbanGame = {
+  get player(){return player;},
+  ghostBook,
+  scenes,
+  print,
+  clearChoices,
+  addChoice,
+  updateStatus,
+  changeStats,
+  setLocation,
+  addItem,
+  addGhostCoins,
+  completeTask,
+  levelUpExorcist,
+  learnRule,
+  ruleViolation,
+  advanceTime,
+  unlockSystems,
+  ghostCapacity,
+  apartmentHub,
+  hospitalHub,
+  startHospitalTrial,
+  sleepOneHour,
+  watchTV,
+  meditate,
+  saveGame,
+  loadGame,
+  registerScene,
+  goScene,
+  contractGhost
+};
+
+// ===== 后续扩展区 =====
+// 示例：
+// UrbanGame.registerScene("subway_chapter", function(){
+//   UrbanGame.clearChoices();
+//   UrbanGame.setLocation("地铁");
+//   UrbanGame.print("末班车没有司机。","red");
+// });
+
+mainMenu();
+</script>
+
 </body>
 </html>
