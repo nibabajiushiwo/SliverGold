@@ -24,13 +24,14 @@
 
 body{
   margin:0;
-  background:radial-gradient(circle at top,#111 0,#050505 42%,#020202 100%);
+  background:
+    linear-gradient(rgba(144,255,144,.025) 1px,transparent 1px),
+    radial-gradient(circle at top,#151515 0,#050505 48%,#020202 100%);
+  background-size:100% 3px,auto;
   color:var(--text);
   font-family:Consolas,"Microsoft YaHei",monospace;
-  display:flex;
-  justify-content:center;
-  align-items:center;
   min-height:100vh;
+  overflow:hidden;
 }
 
 body.pollution-critical{
@@ -55,26 +56,34 @@ body.pollution-critical .inputLine:focus{
 }
 
 #game{
-  width:min(94%,960px);
-  height:92vh;
+  width:100vw;
+  height:100vh;
   background:rgba(13,13,13,.96);
-  border:1px solid var(--line);
-  display:flex;
+  border:0;
+  display:grid;
+  grid-template-rows:auto 1fr;
   flex-direction:column;
   position:relative;
-  box-shadow:0 24px 70px rgba(0,0,0,.45);
+  box-shadow:inset 0 0 90px rgba(0,0,0,.8);
 }
 
 #title{
-  padding:14px 16px;
+  padding:12px 16px;
   border-bottom:1px solid var(--line);
   color:var(--green);
-  font-size:22px;
+  font-size:20px;
   letter-spacing:0;
   display:flex;
   justify-content:space-between;
   gap:12px;
   align-items:center;
+}
+
+#title small{
+  display:block;
+  color:var(--muted);
+  font-size:11px;
+  margin-top:4px;
 }
 
 #quickActions{
@@ -85,8 +94,7 @@ body.pollution-critical .inputLine:focus{
 }
 
 #status{
-  padding:10px 16px;
-  border-bottom:1px solid var(--line);
+  padding:0;
   font-size:13px;
   color:var(--muted);
   white-space:pre-line;
@@ -94,16 +102,18 @@ body.pollution-critical .inputLine:focus{
 }
 
 #output{
-  flex:1;
-  padding:18px;
+  min-height:0;
+  padding:16px;
   overflow-y:auto;
   line-height:1.72;
   white-space:pre-wrap;
+  border:1px solid var(--line);
+  background:rgba(4,4,4,.58);
 }
 
 #choices{
-  padding:14px;
-  border-top:1px solid var(--line);
+  padding:12px 0 0;
+  border-top:0;
   display:flex;
   flex-wrap:wrap;
   gap:10px;
@@ -228,6 +238,167 @@ button:disabled{
   color:#ffd3d3;
 }
 
+#terminalGrid{
+  display:grid;
+  grid-template-columns:minmax(230px,280px) minmax(0,1fr) minmax(230px,280px);
+  gap:12px;
+  min-height:0;
+  padding:12px;
+}
+
+.sidePanel,#centerPanel{
+  min-height:0;
+}
+
+.sidePanel{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+#centerPanel{
+  display:grid;
+  grid-template-rows:auto auto minmax(0,1fr) auto auto;
+  gap:10px;
+}
+
+.panelBlock{
+  border:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(255,255,255,.025),rgba(0,0,0,.18));
+  padding:12px;
+  min-height:0;
+  box-shadow:0 0 24px rgba(144,255,144,.025);
+}
+
+.panelBlock.grow{
+  flex:1;
+  overflow:auto;
+}
+
+.panelTitle{
+  color:#e5e5e5;
+  font-size:12px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  border-bottom:1px solid #1e1e1e;
+  padding-bottom:8px;
+  margin-bottom:10px;
+}
+
+#sceneHeader{
+  border:1px solid var(--line);
+  background:#0a0a0a;
+  padding:11px 12px;
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+}
+
+#locationName{
+  color:#f4f4f4;
+  font-size:18px;
+}
+
+#locationDesc{
+  display:block;
+  color:var(--muted);
+  margin-top:4px;
+  line-height:1.4;
+}
+
+#threatBadge{
+  border:1px solid var(--line-strong);
+  padding:6px 9px;
+  color:var(--green);
+  min-width:72px;
+  text-align:center;
+}
+
+#worldTicker,#channelDock{
+  border:1px solid var(--line);
+  background:#090909;
+}
+
+#worldTicker{
+  min-height:42px;
+  padding:10px 12px;
+  color:var(--muted);
+  overflow:hidden;
+}
+
+#channelDock{
+  padding:10px 12px;
+  max-height:128px;
+  overflow:auto;
+}
+
+#channels,.feedBox,#mapNodes,.compactList{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+
+.feedItem,.channelMsg,.mapNode,.ghostItem{
+  border:1px solid #202020;
+  background:rgba(255,255,255,.018);
+  padding:8px;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.45;
+}
+
+.mapNode{
+  cursor:pointer;
+  color:#ddd;
+}
+
+.mapNode:hover{
+  border-color:var(--green);
+}
+
+.mapNode.active{
+  color:var(--green);
+  border-color:var(--green);
+  box-shadow:0 0 16px rgba(144,255,144,.08);
+}
+
+.mapNode.dangerous{
+  color:#ffc9c9;
+  border-color:#492424;
+}
+
+#actionMenu{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+
+#actionMenu button{
+  padding:9px 10px;
+  min-height:38px;
+}
+
+.msg-system{color:#9ad7ff;}
+.msg-world{color:#d8d8d8;}
+.msg-danger{color:var(--red);}
+.msg-npc{color:var(--yellow);}
+.msg-log{color:var(--muted);}
+
+body.pollution-critical{
+  animation:screenJitter .22s infinite steps(2,end);
+}
+
+body.pollution-critical button:nth-child(3n)::after{
+  content:" //ERR";
+  color:#ff4d4d;
+}
+
+@keyframes screenJitter{
+  0%,100%{transform:translate(0,0);}
+  50%{transform:translate(1px,-1px);}
+}
+
 @media (max-width:640px){
   body{align-items:stretch;}
   #game{
@@ -251,23 +422,91 @@ button:disabled{
     width:94%;
   }
 }
+
+@media (max-width:980px){
+  body{overflow:auto;}
+  #game{height:auto;min-height:100vh;}
+  #terminalGrid{
+    grid-template-columns:1fr;
+  }
+  #centerPanel{
+    min-height:70vh;
+  }
+}
 </style>
 </head>
 <body>
 
 <div id="game">
-  <div id="title">
-    <span>《都市异闻录：鬼契约》</span>
+  <header id="title">
+    <div>
+      <span>《都市异闻录：鬼契约》</span>
+      <small>YUSHEN FIELD TERMINAL / SCP-LIKE INCIDENT CLIENT</small>
+    </div>
     <div id="quickActions">
       <button id="phoneQuickBtn" class="miniBtn" onclick="openPhone()">旧手机</button>
       <button id="bagQuickBtn" class="miniBtn" onclick="openBag()">背包</button>
       <button class="miniBtn" onclick="saveGame()">保存</button>
     </div>
-  </div>
+  </header>
 
-  <div id="status"></div>
-  <div id="output"></div>
-  <div id="choices"></div>
+  <main id="terminalGrid">
+    <aside id="leftPanel" class="sidePanel">
+      <section class="panelBlock">
+        <div class="panelTitle">玩家档案</div>
+        <div id="status"></div>
+      </section>
+      <section class="panelBlock">
+        <div class="panelTitle">契约状态</div>
+        <div id="ghostPanel" class="compactList"></div>
+      </section>
+      <section class="panelBlock grow">
+        <div class="panelTitle">节点地图</div>
+        <div id="mapNodes"></div>
+      </section>
+    </aside>
+
+    <section id="centerPanel">
+      <div id="sceneHeader">
+        <div>
+          <span id="locationName">未定位</span>
+          <small id="locationDesc">等待终端同步位置数据</small>
+        </div>
+        <div id="threatBadge">SAFE</div>
+      </div>
+      <div id="worldTicker"></div>
+      <div id="output"></div>
+      <div id="choices"></div>
+      <div id="channelDock">
+        <div class="panelTitle">频道监听</div>
+        <div id="channels"></div>
+      </div>
+    </section>
+
+    <aside id="rightPanel" class="sidePanel">
+      <section class="panelBlock">
+        <div class="panelTitle">功能菜单</div>
+        <div id="actionMenu">
+          <button onclick="openBag()">背包</button>
+          <button onclick="openPhone()">手机/终端</button>
+          <button onclick="tasks()">任务</button>
+          <button onclick="teleportUI()">地图</button>
+          <button onclick="shop()">黑市</button>
+          <button onclick="codex()">图鉴</button>
+          <button onclick="showRulesPanel()">规则</button>
+          <button onclick="showAchievements()">成就</button>
+        </div>
+      </section>
+      <section class="panelBlock">
+        <div class="panelTitle">系统公告</div>
+        <div id="systemFeed" class="feedBox"></div>
+      </section>
+      <section class="panelBlock grow">
+        <div class="panelTitle">动态提示</div>
+        <div id="hintFeed" class="feedBox"></div>
+      </section>
+    </aside>
+  </main>
 
   <div id="phone" class="modal">
     <div class="modalHeader">
@@ -303,6 +542,15 @@ const phoneTitle = document.getElementById("phoneTitle");
 const phoneQuickBtn = document.getElementById("phoneQuickBtn");
 const bag = document.getElementById("bag");
 const bagBody = document.getElementById("bagBody");
+const ghostPanel = document.getElementById("ghostPanel");
+const mapNodes = document.getElementById("mapNodes");
+const locationNameEl = document.getElementById("locationName");
+const locationDescEl = document.getElementById("locationDesc");
+const threatBadge = document.getElementById("threatBadge");
+const worldTicker = document.getElementById("worldTicker");
+const channels = document.getElementById("channels");
+const systemFeed = document.getElementById("systemFeed");
+const hintFeed = document.getElementById("hintFeed");
 
 const SAVE_KEY = "urban_contract_save_v1";
 
@@ -350,6 +598,149 @@ const ghostBook = {
 
 const scenes = {};
 const rookieGhostIds = ["ghostEye","seamWraith","ashUmbrella"];
+const ruleTextArchive = {};
+
+const locations = {
+  "出租屋":{
+    name:"出租屋",
+    desc:"临时安全屋。可以睡觉、看电视、打坐、处理终端任务。",
+    links:["街道","闹鬼医院","黑市"],
+    danger:false,
+    explored:true,
+    onEnter:() => player.flags.escapedApartment ? apartmentHub() : startIntro()
+  },
+  "走廊":{
+    name:"公寓走廊",
+    desc:"14栋异常走廊，声控灯会记录你的移动。",
+    links:["出租屋","楼梯间"],
+    danger:true,
+    explored:false,
+    onEnter:escapeRoom
+  },
+  "街道":{
+    name:"雨夜街道",
+    desc:"公寓外的缓冲地带，便利店灯牌像一只没有闭上的眼。",
+    links:["出租屋","便利店","闹鬼医院"],
+    danger:false,
+    explored:false,
+    onEnter:afterApartmentStreet
+  },
+  "便利店":{
+    name:"便利店 / 御神接应点",
+    desc:"御神接应者曾在这里向你交付终端。",
+    links:["街道","出租屋","黑市"],
+    danger:false,
+    explored:false,
+    onEnter:meetNpc
+  },
+  "闹鬼医院":{
+    name:"闹鬼医院",
+    desc:"新手打怪区。走廊消毒水味很重，像刚洗过一场事故。",
+    links:["出租屋","街道","诡秘医院"],
+    danger:true,
+    explored:false,
+    onEnter:enterHospitalNode
+  },
+  "诡秘医院":{
+    name:"诡秘医院",
+    desc:"二阶突破试炼地。这里的规则比墙皮更容易脱落。",
+    links:["闹鬼医院"],
+    danger:true,
+    explored:false,
+    onEnter:startHospitalTrial
+  },
+  "黑市":{
+    name:"黑市",
+    desc:"深网终端投影出的交易层，价格会记住你看它的次数。",
+    links:["出租屋","街道"],
+    danger:false,
+    explored:false,
+    onEnter:shop
+  },
+  "地铁":{
+    name:"末班地铁",
+    desc:"暂未开放的城市节点。列车仍在地下空跑。",
+    links:["街道"],
+    danger:true,
+    explored:false
+  }
+};
+
+const TerminalUI = {
+  channelSeed:[
+    ["WORLD","[公告] 城市污染指数维持在灰色预警。"],
+    ["NPC","御神接线员：不要在 03:00 后相信任何自动门。"],
+    ["匿名用户","有人看到14栋的灯又亮了。"],
+    ["SYSTEM","失踪人口数据同步失败，错误码 404-ROOM。"]
+  ],
+  pushFeed(target,text,type="log"){
+    if(!target) return;
+    const item = document.createElement("div");
+    item.className = `feedItem msg-${type}`;
+    item.innerText = text;
+    target.prepend(item);
+    while(target.children.length > 8) target.removeChild(target.lastChild);
+  },
+  pushChannel(channel,text){
+    if(!channels) return;
+    const item = document.createElement("div");
+    item.className = "channelMsg";
+    item.innerText = `[${channel}] ${text}`;
+    channels.prepend(item);
+    while(channels.children.length > 7) channels.removeChild(channels.lastChild);
+  },
+  renderLocation(){
+    const loc = locations[player.location] || {name:player.location,desc:"未登记节点。",danger:false,links:[]};
+    if(locationNameEl) locationNameEl.innerText = loc.name;
+    if(locationDescEl) locationDescEl.innerText = loc.desc;
+    if(threatBadge){
+      threatBadge.innerText = loc.danger ? "DANGER" : "STABLE";
+      threatBadge.style.color = loc.danger ? "var(--red)" : "var(--green)";
+    }
+    if(worldTicker){
+      worldTicker.innerText = loc.danger ? "世界信息流：附近存在异常实体活动，建议保持终端在线。" : "世界信息流：节点信号稳定，未检测到直接追踪。";
+    }
+  },
+  renderGhostPanel(){
+    if(!ghostPanel) return;
+    ghostPanel.innerHTML = "";
+    if(!player.ghosts.length){
+      const empty = document.createElement("div");
+      empty.className = "ghostItem";
+      empty.innerText = "尚未契约鬼。";
+      ghostPanel.appendChild(empty);
+      return;
+    }
+    player.ghosts.forEach(ghost => {
+      const item = document.createElement("div");
+      item.className = "ghostItem";
+      item.innerText = `${ghost.name}\n力:${ghost.power} 失控:${ghost.instability}\n${ghost.passive || "无被动"}`;
+      ghostPanel.appendChild(item);
+    });
+  },
+  renderMap(){
+    if(!mapNodes) return;
+    mapNodes.innerHTML = "";
+    Object.keys(locations).forEach(key => {
+      const loc = locations[key];
+      const node = document.createElement("button");
+      node.className = `mapNode ${loc.danger ? "dangerous" : ""} ${player.location === key ? "active" : ""}`;
+      node.innerText = `${loc.name}\n${loc.explored ? "已探索" : "未探索"} ｜ ${loc.danger ? "危险" : "稳定"}`;
+      node.onclick = () => moveToLocation(key);
+      mapNodes.appendChild(node);
+    });
+  },
+  renderAll(){
+    this.renderLocation();
+    this.renderGhostPanel();
+    this.renderMap();
+  },
+  seed(){
+    this.channelSeed.forEach(([channel,text]) => this.pushChannel(channel,text));
+    this.pushFeed(systemFeed,"御神终端初始化完成。","system");
+    this.pushFeed(hintFeed,"提示：右侧功能菜单与左侧节点地图均可驱动游戏。","log");
+  }
+};
 
 const hospitalEnemies = [
   {id:"facelessPatient",name:"无面病患",maxHp:90,spirit:80,attack:13,coins:[4,8],qiGain:5,skill:"抓挠病历"},
@@ -445,12 +836,25 @@ function normalizePlayer(data){
   player.ghostQi = Math.min(player.ghostQi, player.maxGhostQi);
 }
 
+function messageTypeFromClass(className=""){
+  if(className === "red" || className === "danger") return "danger";
+  if(className === "purple" || className === "yellow") return "npc";
+  if(className === "green") return "system";
+  if(className === "muted") return "log";
+  return "world";
+}
+
 function print(text,className=""){
+  const type = messageTypeFromClass(className);
   const line = document.createElement("div");
+  line.classList.add(`msg-${type}`);
   if(className) line.classList.add(className);
   line.innerText = text;
   output.appendChild(line);
   output.scrollTop = output.scrollHeight;
+  if(type === "danger") TerminalUI.pushFeed(systemFeed,text,"danger");
+  if(type === "system") TerminalUI.pushFeed(systemFeed,text,"system");
+  if(type === "npc") TerminalUI.pushChannel("NPC",text);
 }
 
 function clearChoices(){
@@ -518,6 +922,7 @@ function advanceTime(minutes=1,reason=""){
 function learnRule(id,text){
   if(player.rulesKnown.includes(id)) return;
   player.rulesKnown.push(id);
+  ruleTextArchive[id] = text;
   print(`[ RULE ] ${text}`,"yellow");
 }
 
@@ -568,6 +973,7 @@ function updateStatus(){
   if(player.sanity <= 0 && !player.gameOver){
     death("你的理智被最后一声低语压垮。");
   }
+  TerminalUI.renderAll();
 }
 
 function updateSystemAccess(){
@@ -594,15 +1000,24 @@ function changeStats({sanity=0,pollution=0}){
 
 function setLocation(location){
   player.location = location;
+  if(locations[location]) locations[location].explored = true;
   updateStatus();
 }
 
 function enterLocation(location){
+  moveToLocation(location);
+}
+
+function moveToLocation(location){
+  const loc = locations[location];
   setLocation(location);
-  if(location === "出租屋" && player.flags.escapedApartment){
-    apartmentHub();
-  }else if(location === "闹鬼医院"){
-    hospitalHub();
+  TerminalUI.pushFeed(hintFeed,`节点移动：${loc ? loc.name : location}`,"system");
+  if(loc && typeof loc.onEnter === "function"){
+    loc.onEnter();
+  }else{
+    clearChoices();
+    print(`${location} 暂未开放。终端只捕捉到断续噪声。`,"muted");
+    addChoice("返回出租屋",() => moveToLocation("出租屋"));
   }
 }
 
@@ -1159,7 +1574,7 @@ function meditate(){
   saveGame();
 }
 
-function hospitalHub(){
+function enterHospitalNode(){
   clearChoices();
   closePhone();
   closeBag();
@@ -1173,6 +1588,10 @@ function hospitalHub(){
   addChoice("打开终端",openPhone);
   addChoice("背包",openBag);
   saveGame();
+}
+
+function hospitalHub(){
+  enterHospitalNode();
 }
 
 function startHospitalCombat(){
@@ -1707,6 +2126,44 @@ function addPhoneBack(){
   phoneBody.appendChild(back);
 }
 
+function showRulesPanel(){
+  phone.style.display = "flex";
+  phoneTitle.innerText = "规则档案";
+  phoneBody.innerHTML = "<b>已记录规则</b>";
+  if(!player.rulesKnown.length){
+    const empty = document.createElement("div");
+    empty.className = "muted";
+    empty.style.marginTop = "10px";
+    empty.innerText = "暂无规则记录。";
+    phoneBody.appendChild(empty);
+  }
+  player.rulesKnown.forEach((rule,index) => {
+    const row = document.createElement("div");
+    row.className = "row";
+    row.innerText = `${String(index + 1).padStart(2,"0")} / ${ruleTextArchive[rule] || rule}`;
+    phoneBody.appendChild(row);
+  });
+}
+
+function showAchievements(){
+  phone.style.display = "flex";
+  phoneTitle.innerText = "成就";
+  phoneBody.innerHTML = "<b>成就记录</b>";
+  const data = [
+    ["逃离公寓",player.flags.escapedApartment],
+    ["御神接入",player.flags.systemsUnlocked],
+    ["完成初契",player.ghosts.length > 0],
+    ["医院清扫",player.hospitalKills >= 10],
+    ["二阶试炼",player.flags.hospitalTrialCleared]
+  ];
+  data.forEach(([name,done]) => {
+    const row = document.createElement("div");
+    row.className = "row";
+    row.innerText = `${done ? "[完成]" : "[未完成]"} ${name}`;
+    phoneBody.appendChild(row);
+  });
+}
+
 function login(){
   clearChoices();
   print("请输入你的名字。");
@@ -2086,6 +2543,10 @@ function mainMenu(){
   output.innerHTML = "";
   clearChoices();
   updateStatus();
+  if(!window.__terminalSeeded){
+    TerminalUI.seed();
+    window.__terminalSeeded = true;
+  }
   print("《都市异闻录：鬼契约》","green");
   print("");
   print("第一章：逃离公寓。");
@@ -2093,6 +2554,21 @@ function mainMenu(){
   print("");
   addChoice("新游戏",newGame);
   addChoice("读取存档",loadGame);
+}
+
+function startAmbientNetwork(){
+  const events = [
+    ["WORLD","[失踪公告] 一名御鬼师最后定位于闹鬼医院地下层。"],
+    ["匿名用户","你们有没有遇到过会改按钮文字的污染？"],
+    ["NPC","御神接线员：污染超过阈值时，不要相信红色提示。"],
+    ["SYSTEM","世界污染采样完成：数据存在轻微回声。"],
+    ["匿名用户","404病房今天又上线了。"]
+  ];
+  setInterval(() => {
+    const [channel,text] = events[Math.floor(Math.random() * events.length)];
+    TerminalUI.pushChannel(channel,text);
+    if(Math.random() < 0.35) TerminalUI.pushFeed(hintFeed,text,channel === "SYSTEM" ? "system" : "log");
+  },18000);
 }
 
 function registerScene(name,handler){
@@ -2118,6 +2594,8 @@ registerScene("hospitalTrial",startHospitalTrial);
 window.UrbanGame = {
   get player(){return player;},
   ghostBook,
+  locations,
+  TerminalUI,
   scenes,
   print,
   clearChoices,
@@ -2125,6 +2603,7 @@ window.UrbanGame = {
   updateStatus,
   changeStats,
   setLocation,
+  moveToLocation,
   addItem,
   addGhostCoins,
   completeTask,
@@ -2135,6 +2614,7 @@ window.UrbanGame = {
   unlockSystems,
   ghostCapacity,
   apartmentHub,
+  enterHospitalNode,
   hospitalHub,
   startHospitalTrial,
   sleepOneHour,
@@ -2142,6 +2622,8 @@ window.UrbanGame = {
   meditate,
   saveGame,
   loadGame,
+  showRulesPanel,
+  showAchievements,
   registerScene,
   goScene,
   contractGhost
@@ -2155,6 +2637,7 @@ window.UrbanGame = {
 //   UrbanGame.print("末班车没有司机。","red");
 // });
 
+startAmbientNetwork();
 mainMenu();
 </script>
 
